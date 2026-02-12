@@ -1,160 +1,133 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dienstgruppe D – Clean Demo</title>
-
-<style>
-body {
-    margin:0;
-    font-family:system-ui;
-    background:#0f172a;
-    color:white;
-}
-header {
-    padding:16px;
-    background:#111827;
-    font-weight:700;
-    font-size:18px;
-}
-.container {
-    padding:20px;
-}
-select, button {
-    padding:8px;
-    border-radius:8px;
-    border:none;
-    margin:4px 0;
-}
-button {
-    background:#22d3ee;
-    cursor:pointer;
-    font-weight:600;
-}
-.grid {
-    margin-top:20px;
-    overflow:auto;
-}
-table {
-    border-collapse:collapse;
-    width:100%;
-}
-th, td {
-    border:1px solid #334155;
-    padding:6px;
-    text-align:center;
-}
-th {
-    background:#1e293b;
-}
-td.yellow {
-    background:#fde047;
-    color:black;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dienstgruppe D – PRO (Final Demo)</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">DG</div>
+      <div class="brandText">
+        <div class="title">Dienstgruppe D</div>
+        <div class="subtitle">PRO – Final Demo (ohne Login / ohne Server)</div>
+      </div>
+    </div>
 
-<header>Dienstgruppe D – PRO (Ultra Clean Test)</header>
+    <div class="topActions">
+      <button class="btn ghost" id="btnEmployees" title="Mitarbeiter verwalten">Mitarbeiter</button>
+      <button class="btn ghost" id="btnExport" title="Export (Demo)">Export</button>
+      <button class="btn ghost" id="btnHelp" title="Hilfe">?</button>
+    </div>
+  </header>
 
-<div class="container">
+  <main class="shell">
+    <section class="controls">
+      <div class="controlRow">
+        <div class="field">
+          <label>Ich bin</label>
+          <select id="meSelect"></select>
+        </div>
 
-<label>Ich bin:</label><br>
-<select id="nameSelect"></select><br>
+        <div class="field">
+          <label>Monat</label>
+          <div class="row">
+            <button class="iconBtn" id="prevMonth" aria-label="Vorheriger Monat">◀</button>
+            <select id="monthSelect"></select>
+            <button class="iconBtn" id="nextMonth" aria-label="Nächster Monat">▶</button>
+          </div>
+        </div>
 
-<label>Monat:</label><br>
-<select id="monthSelect"></select><br>
+        <div class="field">
+          <label>Jahr</label>
+          <select id="yearSelect"></select>
+        </div>
 
-<label>Jahr:</label><br>
-<select id="yearSelect"></select><br>
+        <div class="field grow">
+          <label>Legende</label>
+          <div class="legend">
+            <span class="chip work">Arbeitstag</span>
+            <span class="chip sat">Sa</span>
+            <span class="chip sun">So</span>
+            <span class="chip holiday">Ferien (BY)</span>
+          </div>
+        </div>
+      </div>
 
-<button onclick="openMonth()">Öffnen</button>
+      <div class="codeRow">
+        <div class="codeTitle">Codes:</div>
+        <div class="codeButtons" id="codeButtons"></div>
+        <div class="codeHint">Tippen: Code auswählen → dann Zelle tippen. (Ohne Code: Gelb an/aus)</div>
+        <div class="codeRight">
+          <button class="btn small" id="btnClearCode">Code aus</button>
+        </div>
+      </div>
+    </section>
 
-<div id="gridArea" class="grid"></div>
+    <section class="gridWrap">
+      <div class="gridHeader">
+        <div class="gridTitle" id="gridTitle">Monatsansicht</div>
+        <div class="gridMeta" id="gridMeta"></div>
+      </div>
 
-</div>
+      <div class="gridScroller" id="gridScroller" aria-label="Schichtplan Tabelle">
+        <!-- table injected -->
+      </div>
 
-<script>
-const employees = ["Wiesent","Puhl","Botzenhard","Sommer","Schmid"];
-const months = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+      <div class="notes">
+        <div class="notesTitle">Bemerkungen (Monat)</div>
+        <textarea id="monthNotes" placeholder="Notizen… (werden lokal auf dem Gerät gespeichert)"></textarea>
+      </div>
+    </section>
+  </main>
 
-const nameSelect = document.getElementById("nameSelect");
-employees.forEach(e=>{
-    let o=document.createElement("option");
-    o.value=e;o.text=e;
-    nameSelect.appendChild(o);
-});
+  <!-- Employees modal -->
+  <div class="modalBackdrop" id="modalBackdrop" hidden></div>
+  <div class="modal" id="employeesModal" hidden>
+    <div class="modalHead">
+      <div>
+        <div class="modalTitle">Mitarbeiterverwaltung</div>
+        <div class="modalSub">Ohne Login. Änderungen werden lokal gespeichert (Demo).</div>
+      </div>
+      <button class="iconBtn" id="closeEmployees" aria-label="Schließen">✕</button>
+    </div>
 
-const monthSelect=document.getElementById("monthSelect");
-months.forEach((m,i)=>{
-    let o=document.createElement("option");
-    o.value=i+1;o.text=m;
-    monthSelect.appendChild(o);
-});
+    <div class="modalBody">
+      <div class="empList" id="empList"></div>
 
-const yearSelect=document.getElementById("yearSelect");
-for(let y=2026;y<=2032;y++){
-    let o=document.createElement("option");
-    o.value=y;o.text=y;
-    yearSelect.appendChild(o);
-}
+      <div class="empAdd">
+        <input id="empNewName" type="text" placeholder="Neuer Name (z.B. Schmidt)" />
+        <button class="btn" id="empAddBtn">Hinzufügen</button>
+      </div>
 
-function openMonth(){
-    const month=parseInt(monthSelect.value);
-    const year=parseInt(yearSelect.value);
-    buildGrid(year,month);
-}
+      <div class="modalTip">
+        Profi-Variante: Wenn du das später „für alle Geräte“ willst, hängen wir diese Liste an Supabase (ohne Login nur mit RLS/Whitelist).
+      </div>
+    </div>
+  </div>
 
-function daysInMonth(year,month){
-    return new Date(year,month,0).getDate();
-}
+  <!-- Help modal -->
+  <div class="modal" id="helpModal" hidden>
+    <div class="modalHead">
+      <div>
+        <div class="modalTitle">Kurz-Hilfe</div>
+        <div class="modalSub">Finales Look & Feel – Funktionen sind in dieser Demo bewusst minimal.</div>
+      </div>
+      <button class="iconBtn" id="closeHelp" aria-label="Schließen">✕</button>
+    </div>
+    <div class="modalBody">
+      <ul class="helpList">
+        <li><b>2/2-Rhythmus:</b> Gelb/Weiß wird automatisch pro Datum erzeugt.</li>
+        <li><b>Ferien (BY):</b> Datumskopf wird grün markiert (wie in deiner Live-Logik aus dem alten Code).</li>
+        <li><b>Codes:</b> Code wählen → Zelle tippen → Text + Farbe.</li>
+        <li><b>Ohne Code:</b> Tippen toggelt Gelb (Demo).</li>
+      </ul>
+    </div>
+  </div>
 
-function buildGrid(year,month){
-    const grid=document.getElementById("gridArea");
-    grid.innerHTML="";
-    const table=document.createElement("table");
-
-    const thead=document.createElement("thead");
-    const hr=document.createElement("tr");
-    hr.innerHTML="<th>Name</th>";
-    for(let d=1;d<=daysInMonth(year,month);d++){
-        let th=document.createElement("th");
-        th.textContent=d;
-        hr.appendChild(th);
-    }
-    thead.appendChild(hr);
-    table.appendChild(thead);
-
-    const tbody=document.createElement("tbody");
-
-    employees.forEach(name=>{
-        let tr=document.createElement("tr");
-        let tdName=document.createElement("td");
-        tdName.textContent=name;
-        tr.appendChild(tdName);
-
-        for(let d=1;d<=daysInMonth(year,month);d++){
-            let td=document.createElement("td");
-            td.onclick=function(){
-                td.classList.toggle("yellow");
-            };
-            tr.appendChild(td);
-        }
-
-        tbody.appendChild(tr);
-    });
-
-    table.appendChild(tbody);
-    grid.appendChild(table);
-}
-
-// default month load
-monthSelect.value = new Date().getMonth()+1;
-yearSelect.value = new Date().getFullYear();
-openMonth();
-</script>
-
+  <script src="config.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

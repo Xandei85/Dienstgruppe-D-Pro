@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dienstgruppe D – Clean Demo</title>
+
+<style>
+body {
+    margin:0;
+    font-family:system-ui;
+    background:#0f172a;
+    color:white;
+}
+header {
+    padding:16px;
+    background:#111827;
+    font-weight:700;
+    font-size:18px;
+}
+.container {
+    padding:20px;
+}
+select, button {
+    padding:8px;
+    border-radius:8px;
+    border:none;
+    margin:4px 0;
+}
+button {
+    background:#22d3ee;
+    cursor:pointer;
+    font-weight:600;
+}
+.grid {
+    margin-top:20px;
+    overflow:auto;
+}
+table {
+    border-collapse:collapse;
+    width:100%;
+}
+th, td {
+    border:1px solid #334155;
+    padding:6px;
+    text-align:center;
+}
+th {
+    background:#1e293b;
+}
+td.yellow {
+    background:#fde047;
+    color:black;
+}
+</style>
+</head>
+
+<body>
+
+<header>Dienstgruppe D – PRO (Ultra Clean Test)</header>
+
+<div class="container">
+
+<label>Ich bin:</label><br>
+<select id="nameSelect"></select><br>
+
+<label>Monat:</label><br>
+<select id="monthSelect"></select><br>
+
+<label>Jahr:</label><br>
+<select id="yearSelect"></select><br>
+
+<button onclick="openMonth()">Öffnen</button>
+
+<div id="gridArea" class="grid"></div>
+
+</div>
+
+<script>
+const employees = ["Wiesent","Puhl","Botzenhard","Sommer","Schmid"];
+const months = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+
+const nameSelect = document.getElementById("nameSelect");
+employees.forEach(e=>{
+    let o=document.createElement("option");
+    o.value=e;o.text=e;
+    nameSelect.appendChild(o);
+});
+
+const monthSelect=document.getElementById("monthSelect");
+months.forEach((m,i)=>{
+    let o=document.createElement("option");
+    o.value=i+1;o.text=m;
+    monthSelect.appendChild(o);
+});
+
+const yearSelect=document.getElementById("yearSelect");
+for(let y=2026;y<=2032;y++){
+    let o=document.createElement("option");
+    o.value=y;o.text=y;
+    yearSelect.appendChild(o);
+}
+
+function openMonth(){
+    const month=parseInt(monthSelect.value);
+    const year=parseInt(yearSelect.value);
+    buildGrid(year,month);
+}
+
+function daysInMonth(year,month){
+    return new Date(year,month,0).getDate();
+}
+
+function buildGrid(year,month){
+    const grid=document.getElementById("gridArea");
+    grid.innerHTML="";
+    const table=document.createElement("table");
+
+    const thead=document.createElement("thead");
+    const hr=document.createElement("tr");
+    hr.innerHTML="<th>Name</th>";
+    for(let d=1;d<=daysInMonth(year,month);d++){
+        let th=document.createElement("th");
+        th.textContent=d;
+        hr.appendChild(th);
+    }
+    thead.appendChild(hr);
+    table.appendChild(thead);
+
+    const tbody=document.createElement("tbody");
+
+    employees.forEach(name=>{
+        let tr=document.createElement("tr");
+        let tdName=document.createElement("td");
+        tdName.textContent=name;
+        tr.appendChild(tdName);
+
+        for(let d=1;d<=daysInMonth(year,month);d++){
+            let td=document.createElement("td");
+            td.onclick=function(){
+                td.classList.toggle("yellow");
+            };
+            tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    grid.appendChild(table);
+}
+
+// default month load
+monthSelect.value = new Date().getMonth()+1;
+yearSelect.value = new Date().getFullYear();
+openMonth();
+</script>
+
+</body>
+</html>
